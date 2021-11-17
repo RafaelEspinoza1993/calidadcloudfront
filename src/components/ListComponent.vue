@@ -4,6 +4,17 @@
       <DetailComponent />
     </b-modal>
     <section>
+      <div :class="modaltype.type == 1 ? 'notification is-success' : modaltype.type == 2 ? 'notification is-warning' : 'notification is-danger'" v-if='isActive'>
+        <button class="delete" @click="AlertControl(false)"></button>
+        {{ alert }}
+      </div>
+      <b-field grouped group-multiline>
+        <div class="control">
+          <b-button @click="formmethod(1, {})" type="is-success" outlined
+            >Create</b-button
+          >
+        </div>
+      </b-field>
       <b-table
         :data="users"
         :loading="loading"
@@ -40,7 +51,9 @@
         </b-table-column>
         <b-table-column field="active" label="Active" sortable v-slot="props">
           <b-icon
-            :icon="props.row.data.active == 1 ? 'account-check' : 'account-cancel'"
+            :icon="
+              props.row.data.active == 1 ? 'account-check' : 'account-cancel'
+            "
             :type="props.row.data.active == 1 ? 'is-success' : 'is-danger'"
           >
           </b-icon>
@@ -72,29 +85,25 @@
           v-slot="props"
         >
           <span class="tag is-danger">{{
-            props.row.data.deleted_at ? formatDate(props.row.data.deleted_at) : ""
+            props.row.data.deleted_at
+              ? formatDate(props.row.data.deleted_at)
+              : ""
           }}</span>
-        </b-table-column>
-        <b-table-column field="create" label="Create" v-slot="props">
-          <b-button
-            @click="formmethod(props.row.create, props.row)"
-            type="is-success"
-            outlined
-            >Create</b-button
-          >
         </b-table-column>
         <b-table-column field="edit" label="Edit" v-slot="props">
           <b-button
-            @click="formmethod(props.row.edit,props.row)"
+            @click="formmethod(props.row.edit, props.row)"
             type="is-warning"
+            :disabled="props.row.data.deleted_at ? true : false"
             outlined
             >Edit</b-button
           >
         </b-table-column>
         <b-table-column field="delete" label="Delete" v-slot="props">
           <b-button
-            @click="formmethod(props.row.delete,props.row)"
+            @click="formmethod(props.row.delete, props.row)"
             type="is-danger"
+            :disabled="props.row.data.deleted_at ? true : false"
             outlined
             >Delete</b-button
           >
@@ -132,10 +141,20 @@ export default {
     this.nextpage(this.payload);
   },
   computed: {
-    ...mapGetters(["users", "current_page", "from", "to", "last_page", "modal"]),
+    ...mapGetters([
+      "users",
+      "current_page",
+      "from",
+      "to",
+      "last_page",
+      "modal",
+      "alert",
+      "isActive",
+      "modaltype"
+    ]),
   },
   methods: {
-    ...mapActions(["nextpage", "ModalType", 'ModalStatus']),
+    ...mapActions(["nextpage", "ModalType", "ModalStatus", "AlertControl"]),
     formatDate(data) {
       let date_ob = new Date(data);
       // adjust 0 before single digit date
@@ -173,11 +192,11 @@ export default {
       );
     },
     formmethod(type, data) {
-        this.ModalType({
-            type: type,
-            data: data
-        });
-        this.ModalStatus(true);
+      this.ModalType({
+        type: type,
+        data: data,
+      });
+      this.ModalStatus(true);
     },
     onPageChange(page) {
       this.payload.page = page;
@@ -200,4 +219,5 @@ export default {
 </script>
 
 <style>
+
 </style>

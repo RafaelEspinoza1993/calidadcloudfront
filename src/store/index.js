@@ -16,7 +16,8 @@ export default new Vuex.Store({
     modaltype: null,
     userSelected: null,
     modal: false,
-    alert: null
+    alert: null,
+    isActive: false,
   },
   getters: {
     users(state) {
@@ -52,6 +53,9 @@ export default new Vuex.Store({
     },
     alert(state) {
       return state.alert
+    },
+    isActive(state) {
+      return state.isActive
     }
   },
   mutations: {
@@ -75,6 +79,9 @@ export default new Vuex.Store({
     },
     alert(state, payload) {
       state.alert = payload
+    },
+    isActive(state, payload) {
+      state.isActive = payload
     }
   },
   actions: {
@@ -91,10 +98,11 @@ export default new Vuex.Store({
         commit(("pages"), response.data.data)
       })
     },
-    async SendForm({commit}, data) {
+    async SendForm({
+      commit
+    }, data) {
       let payload = JSON.stringify(data)
       let url
-      console.log(data);
       switch (data.type) {
         case 1:
           url = 'http://localhost:80/api/create'
@@ -109,15 +117,14 @@ export default new Vuex.Store({
         default:
           break;
       }
-      console.log(url);
       await axios.post(url, payload, {
         headers: {
           'Content-type': 'application/json'
         }
       }).then(response => {
-        commit("alert", 'ok')
-        console.log('ok');
-        console.log(response);
+        commit("alert", response.data.message)
+        commit("isActive", true)
+        commit("modal", false)
       })
     },
     ModalType({
@@ -150,7 +157,14 @@ export default new Vuex.Store({
       commit
     }, payload) {
       commit("modal", payload)
+    },
+    AlertControl({
+      commit
+    }, data) {
+      commit("isActive", data)
     }
   },
-  modules: {}
+  modules: {
+
+  }
 })

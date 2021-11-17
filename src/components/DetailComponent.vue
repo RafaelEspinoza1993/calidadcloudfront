@@ -84,6 +84,12 @@ export default {
       birthday: null,
       password: null,
       active: true,
+      payload: {
+        per_page: 10,
+        sort: "id",
+        order: "desc",
+        page: 1,
+      },
     };
   },
   mounted() {
@@ -99,7 +105,7 @@ export default {
     ...mapGetters(["modaltype", "userSelected"]),
   },
   methods: {
-    ...mapActions(["ModalStatus", "SendForm"]),
+    ...mapActions(["ModalStatus", "SendForm", "nextpage"]),
     formatDate(data) {
       let date_ob = new Date(data);
       // adjust 0 before single digit date
@@ -146,6 +152,7 @@ export default {
           break;
       }
       this.SendForm(payload);
+      this.nextpage(this.payload);
     },
   },
 };
